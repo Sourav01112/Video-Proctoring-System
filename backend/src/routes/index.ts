@@ -16,6 +16,7 @@ import {
   joinRoom,
   endInterview
 } from '../controllers/room.controller';
+import { getAllInterviews, getDashboardStats, getInterviewForReview, updateInterviewStatus } from '../controllers/admin.controller';
 
 const router = express.Router();
 
@@ -53,5 +54,9 @@ router.post('/interviews/:id/events', logEvent);
 router.post('/interviews/:id/video', upload.single('video'), uploadVideo);
 router.get('/interviews/:id/video', getVideo);
 router.get('/interviews/:id/report', generateReport);
+router.get('/admin/interviews', getAllInterviews);
+router.get('/admin/dashboard', getDashboardStats);
+router.get('/admin/interviews/:id', getInterviewForReview);
+router.put('/admin/interviews/:id/status', updateInterviewStatus);
 
 export default router;

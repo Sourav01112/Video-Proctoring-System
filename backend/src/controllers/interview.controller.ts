@@ -43,11 +43,11 @@ export const getInterview = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Interview not found' });
     }
 
-    const duration = interview.endTime 
+    const duration = interview.endTime
       ? Math.floor((interview.endTime.getTime() - interview.startTime.getTime()) / 1000)
       : Math.floor((new Date().getTime() - interview.startTime.getTime()) / 1000);
 
-      console.log("duration::", duration)
+    console.log("duration::", duration)
     res.json({
       interviewId: interview._id,
       candidateName: interview.candidateName,
@@ -56,8 +56,8 @@ export const getInterview = async (req: Request, res: Response) => {
       duration,
       status: interview.status
     });
-  } catch (error:any) {
-    console.log({error})
+  } catch (error: any) {
+    console.log({ error })
     res.status(500).json({ error: 'Failed' });
   }
 };
@@ -81,8 +81,8 @@ export const logEvent = async (req: Request, res: Response) => {
       eventId: interview.events[interview.events.length - 1]
 
     });
-   } catch (error:any) {
-    console.log({error})
+  } catch (error: any) {
+    console.log({ error })
     res.status(500).json({ error: 'Failed to log event' });
   }
 };
@@ -90,7 +90,7 @@ export const logEvent = async (req: Request, res: Response) => {
 export const uploadVideo = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    
+
     if (!req.file) {
       return res.status(400).json({ error: 'No video file provided' });
     }
@@ -103,9 +103,9 @@ export const uploadVideo = async (req: Request, res: Response) => {
     interview.videoUrl = req.file.path;
     interview.status = 'completed';
     interview.endTime = new Date();
-    
+
     interview.integrityScore = calculateIntegrityScore(interview.events);
-    
+
     await interview.save();
 
     res.json({
@@ -114,8 +114,8 @@ export const uploadVideo = async (req: Request, res: Response) => {
       fileSize: req.file.size,
       duration: 0
     });
-    } catch (error:any) {
-    console.log({error})
+  } catch (error: any) {
+    console.log({ error })
     res.status(500).json({ error: 'Failed to upload video' });
   }
 };
@@ -130,7 +130,7 @@ export const getVideo = async (req: Request, res: Response) => {
     }
 
     const videoPath = path.resolve(interview.videoUrl);
-    
+
     if (!fs.existsSync(videoPath)) {
       return res.status(404).json({ error: 'Video file not found' });
     }
@@ -151,6 +151,17 @@ export const getVideo = async (req: Request, res: Response) => {
         'Content-Length': chunksize,
         'Content-Type': 'video/webm',
       };
+      const allowedOrigins: string[] = process.env.ALLOWED_ORIGINS!.split(',');
+      const origin: string = (req.headers.origin ?? req.headers.host ?? "");
+
+
+
+      console.log("imageRouter", { origin }, allowedOrigins.includes(origin), allowedOrigins);
+
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
       res.writeHead(206, head);
       file.pipe(res);
     } else {
@@ -161,8 +172,8 @@ export const getVideo = async (req: Request, res: Response) => {
       res.writeHead(200, head);
       fs.createReadStream(videoPath).pipe(res);
     }
-   } catch (error:any) {
-    console.log({error})
+  } catch (error: any) {
+    console.log({ error })
     res.status(500).json({ error: 'Failed to get video' });
   }
 };
@@ -176,12 +187,12 @@ export const generateReport = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Interview not found' });
     }
 
-    const duration = interview.endTime 
+    const duration = interview.endTime
       ? (interview.endTime.getTime() - interview.startTime.getTime()) / 1000 / 60
       : (new Date().getTime() - interview.startTime.getTime()) / 1000 / 60;
 
     const events = interview.events;
-    
+
     const focusLostCount = events.filter(e => e.eventType === 'FOCUS_LOST').length;
     const faceAbsentCount = events.filter(e => e.eventType === 'FACE_ABSENT').length;
     const multipleFacesCount = events.filter(e => e.eventType === 'MULTIPLE_FACES').length;
@@ -194,7 +205,7 @@ export const generateReport = async (req: Request, res: Response) => {
       .reduce((total, event) => total + (event.duration || 0), 0);
 
     const integrityScore = interview.integrityScore || calculateIntegrityScore(events);
-    
+
     let recommendation: "PASS" | "REVIEW" | "FAIL";
     if (integrityScore >= 80) recommendation = "PASS";
     else if (integrityScore >= 60) recommendation = "REVIEW";

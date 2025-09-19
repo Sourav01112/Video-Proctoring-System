@@ -1,16 +1,40 @@
-FROM node:18-alpine
-
+FROM node:22-alpine AS dependencies
 WORKDIR /app
 
-COPY package*.json ./
-COPY ../shared/package*.json ../shared/
+COPY backend/package*.json ./
+RUN npm ci
 
-RUN npm ci --only=production
+FROM node:22-alpine AS builder
+WORKDIR /app
 
-COPY . .
-COPY ../shared ../shared
+COPY --from=dependencies /app/node_modules ./node_modules
+
+COPY backend/ .
+COPY shared/ ../shared
 
 RUN npm run build
 
+FROM node:22-alpine AS prod-deps
+WORKDIR /app
+
+COPY backend/package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+FROM node:22-alpine AS production
+WORKDIR /app
+
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+COPY --from=prod-deps /app/node_modules ./node_modules
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/../shared ../shared
+COPY --from=builder /app/package*.json ./
+
+RUN chown -R nodejs:nodejs /app
+USER nodejs
+
 EXPOSE 8000
+
 CMD ["npm", "start"]
