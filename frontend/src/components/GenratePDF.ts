@@ -4,6 +4,7 @@ import type { ReviewInterview } from '../types';
 export const generatePDFReport = (interview: ReviewInterview) => {
   const doc = new jsPDF();
   
+  
   const colors = {
     primary: '#1e293b',      
     secondary: '#64748b',   

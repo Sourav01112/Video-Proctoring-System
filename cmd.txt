@@ -1,0 +1,2 @@
+docker tag video-proctoring-system-frontend:latest sourav01112/video-proctoring-system-frontend:latest
+docker push sourav01112/video-proctoring-system-frontend:latest

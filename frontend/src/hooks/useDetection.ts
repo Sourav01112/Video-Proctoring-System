@@ -1,7 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { FaceDetectionService, ObjectDetectionService } from '../services/detectionService';
-import type { DetectionEvent, UseDetectionProps } from '../types';
-
+import type { UseDetectionProps } from '../types';
 
 
 export const useDetection = ({ 
@@ -12,8 +11,7 @@ export const useDetection = ({
 }: UseDetectionProps) => {
   const faceService = useRef(new FaceDetectionService());
   const objectService = useRef(new ObjectDetectionService());
-  const intervalRef = useRef<NodeJS.Timeout>();
-
+  const intervalRef = useRef<any>(null);
   const runDetection = useCallback(async () => {
     if (!videoElement || !isActive) return;
 

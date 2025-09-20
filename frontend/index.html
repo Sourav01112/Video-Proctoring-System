@@ -1,15 +1,43 @@
-<!-- frontend/index.html -->
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Video Proctoring System for Online Interviews" />
-    <title>Video Proctoring System</title>
+    <title>Proctoring App</title>
+    <style>
+      body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    
     <script type="module" src="/src/main.tsx"></script>
+    
+    <script>
+      window.addEventListener('load', function() {
+        console.log('Loading TensorFlow.js CDN after React...');
+        
+        const tfScript = document.createElement('script');
+        tfScript.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js';
+        tfScript.onload = function() {
+          console.log('TensorFlow.js loaded');
+          
+          const webglScript = document.createElement('script');
+          webglScript.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.22.0/dist/tf-backend-webgl.min.js';
+          webglScript.onload = function() {
+            console.log('WebGL backend loaded');
+            
+            const cocoScript = document.createElement('script');
+            cocoScript.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3';
+            cocoScript.onload = function() {
+              console.log('COCO-SSD loaded - Ready for detection!');
+            };
+            document.head.appendChild(cocoScript);
+          };
+          document.head.appendChild(webglScript);
+        };
+        document.head.appendChild(tfScript);
+      });
+    </script>
   </body>
 </html>

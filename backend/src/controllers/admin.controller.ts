@@ -1,28 +1,23 @@
-// backend/src/controllers/adminController.ts
 import { Request, Response } from 'express';
 import Interview from '../models/Interview';
 import Room from '../models/Room';
 
-// Get all completed interviews for admin dashboard
 export const getAllInterviews = async (req: Request, res: Response) => {
   try {
     const { page = 1, limit = 10, search, dateFrom, dateTo, minScore, maxScore } = req.query;
     
     const filter: any = { status: 'completed' };
     
-    // Search by candidate name
     if (search) {
       filter.candidateName = { $regex: search, $options: 'i' };
     }
     
-    // Date range filter
     if (dateFrom || dateTo) {
       filter.startTime = {};
       if (dateFrom) filter.startTime.$gte = new Date(dateFrom as string);
       if (dateTo) filter.startTime.$lte = new Date(dateTo as string);
     }
     
-    // Integrity score filter
     if (minScore || maxScore) {
       filter.integrityScore = {};
       if (minScore) filter.integrityScore.$gte = parseInt(minScore as string);
@@ -70,7 +65,6 @@ export const getAllInterviews = async (req: Request, res: Response) => {
   }
 };
 
-// Get dashboard statistics
 export const getDashboardStats = async (req: Request, res: Response) => {
   try {
     const totalInterviews = await Interview.countDocuments({ status: 'completed' });
@@ -82,7 +76,6 @@ export const getDashboardStats = async (req: Request, res: Response) => {
       startTime: { $gte: todayStart }
     });
     
-    // Get interviews with scores for statistics
     const interviewsWithScores = await Interview.find({
       status: 'completed',
       integrityScore: { $exists: true }
@@ -99,7 +92,6 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     }).length;
     const failCount = interviewsWithScores.filter(i => (i.integrityScore || 0) < 60).length;
     
-    // Most common violations
     const allEvents = interviewsWithScores.flatMap(i => i.events);
     const violationCounts = allEvents.reduce((acc, event) => {
       acc[event.eventType] = (acc[event.eventType] || 0) + 1;
@@ -128,7 +120,6 @@ export const getDashboardStats = async (req: Request, res: Response) => {
   }
 };
 
-// Get detailed interview for review
 export const getInterviewForReview = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -138,14 +129,12 @@ export const getInterviewForReview = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Interview not found' });
     }
     
-    // Get room info for interviewer name
     const room = await Room.findOne({ interviewId: id });
     
     const duration = interview.endTime 
       ? Math.floor((interview.endTime.getTime() - interview.startTime.getTime()) / 60000)
       : 0;
     
-    // Group events by type for analysis
     const eventStats = interview.events.reduce((acc, event) => {
       if (!acc[event.eventType]) {
         acc[event.eventType] = [];
@@ -181,7 +170,6 @@ export const getInterviewForReview = async (req: Request, res: Response) => {
   }
 };
 
-// Update interview status (approve/reject)
 export const updateInterviewStatus = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -212,7 +200,6 @@ export const updateInterviewStatus = async (req: Request, res: Response) => {
   }
 };
 
-// Helper function to generate detailed summary
 const generateDetailedSummary = (events: any[], score: number): string => {
   if (events.length === 0) {
     return "No violations detected during the interview. Candidate maintained proper conduct throughout.";

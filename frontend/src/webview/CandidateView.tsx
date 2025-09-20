@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { VideoCapture } from '../components/VideoCapture';
 import { interviewApi, roomApi } from '../services/api';
 import { socketService } from '../services/socketService';
-import { DetectionEvent } from '../types';
+import type { DetectionEvent } from '../types';
 
 export const CandidateView: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();

@@ -7,9 +7,12 @@ import { ReviewSession } from './webview/ReviewSession'
 import { InterviewerView } from './webview/InterviewerView'
 import './App.css'
 
+console.log("import.meta.env.VITE_API_UR", import.meta.env.VITE_API_URL)
+
 function App() {
+
   return (
-    <Router>
+    <Router  basename="/tutedude">
       <div className="App">
         <Routes>
          <Route path="/" element={<Dashboard />} />
@@ -17,6 +20,7 @@ function App() {
           <Route path="/interviewer/:roomId" element={<InterviewerView />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/interview/:id" element={<ReviewSession />} />
+          <Route path="*" element={<NotFoundPage/>} />
         </Routes>
       </div>
     </Router>
