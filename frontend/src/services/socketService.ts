@@ -8,7 +8,12 @@ class SocketService {
   connect(): void {
     if (!this.socket) {
       this.socket = io(this.serverUrl, {
-        transports: ['websocket', 'polling']
+         path: "/tutedude/socket.io/",
+        transports: ['websocket', 'polling'],
+         upgrade: true,
+        rememberUpgrade: true,
+        timeout: 20000,
+        forceNew: true
       });
 
       this.socket.on('connect', () => {

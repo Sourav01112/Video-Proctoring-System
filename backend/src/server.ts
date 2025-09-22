@@ -20,11 +20,16 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
   : ['http://localhost:3000']; 
 
+
 const io = new Server(server, {
   cors: {
-  origin: allowedOrigins,
-    methods: ["GET", "POST"]
-  }
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true  // Add this for better CORS support
+  },
+  // Add this to handle the custom path from nginx
+  path: "/socket.io/",
+  allowEIO3: true  // For better compatibility
 });
 
 const PORT = process.env.PORT || 8000;

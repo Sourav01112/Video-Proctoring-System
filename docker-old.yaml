@@ -22,8 +22,8 @@ services:
       NODE_ENV: production
       MONGODB_URI: mongodb://mongodb:27017/proctoring
       PORT: 8000
-      FRONTEND_URL: https://submission.souravcodes.in/tutedude
-      ALLOWED_ORIGINS: https://submission.souravcodes.in,https://submission.souravcodes.in/tutedude
+      FRONTEND_URL: http://localhost:3000
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3000/tutedude
     volumes:
       - ./backend/uploads:/app/uploads
     depends_on:
@@ -34,15 +34,15 @@ services:
       context: .  
       dockerfile: ./frontend/Dockerfile  
       args:
-        - VITE_API_URL=https://submission.souravcodes.in/tutedude/api
-        - VITE_SOCKET_URL=https://submission.souravcodes.in
+        - VITE_API_URL=http://localhost:8000/api
+        - VITE_SOCKET_URL=http://localhost:8000
     container_name: proctoring-frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
-      VITE_API_URL: https://submission.souravcodes.in/tutedude/api
-      VITE_SOCKET_URL: https://submission.souravcodes.in/tutedude
+      VITE_API_URL: http://localhost:8000/api
+      VITE_SOCKET_URL: http://localhost:8000
     depends_on:
       - backend
 
