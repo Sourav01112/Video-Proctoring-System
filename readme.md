@@ -55,7 +55,7 @@ The application will be available at:
 
 🚀 **Live project deployed on Oracle Cloud Infrastructure**
 
-Access the production deployment at: `https://tutedude.souravcodes.in`
+Access the production deployment at: `https://submission.souravcodes.in/tutedude/`
 
 *Note: Live demo showcases full functionality including real-time AI detection and video recording capabilities.*
 
